@@ -1,0 +1,91 @@
+---
+
+version: '3.4'
+
+x-logging:
+  &default-logging
+  driver: 'json-file'
+  options:
+    max-size: "${LOGGING_MAX_SIZE}"
+    max-file: "${LOGGING_MAX_FILE}"
+
+networks:
+  keycloak: {}
+  openldap: {}
+  services:
+    external:
+      name: 'services'
+
+services:
+  keycloak:
+    image: "${KEYCLOAK_IMAGE_NAME}:${KEYCLOAK_IMAGE_VERSION}"
+    restart: 'unless-stopped'
+    logging: *default-logging
+    env_file:
+      - './env/keycloak.env'
+    networks:
+      - 'keycloak'
+      - 'services'
+    depends_on:
+      - 'postgres'
+
+  openldap:
+    image: "${OPENLDAP_IMAGE_NAME}:${OPENLDAP_IMAGE_VERSION}"
+    restart: 'unless-stopped'
+    command:
+      - '--loglevel=debug'
+      - '--copy-service'
+    logging: *default-logging
+    env_file:
+      - './env/openldap.env'
+    networks:
+      - 'keycloak'
+      - 'openldap'
+    volumes:
+      - 'openldap_config:/etc/ldap/slapd.d'
+      - 'openldap_db:/var/lib/ldap'
+      - './config/openldap/assets/config/bootstrap/ldif/custom/01-create-root-ou.ldif:/container/service/slapd/assets/config/bootstrap/ldif/custom/01-create-root-ou.ldif'
+      - './config/openldap/assets/config/bootstrap/ldif/custom/02-enable-sha2.ldif:/container/service/slapd/assets/config/bootstrap/ldif/custom/02-enable-sha2.ldif'
+      - './config/openldap/assets/config/bootstrap/ldif/custom/03-enable-ppolicy.ldif:/container/service/slapd/assets/config/bootstrap/ldif/custom/03-enable-ppoplicy.ldif'
+      - './config/openldap/assets/config/bootstrap/ldif/custom/04-configure-ppolicy-overlay.ldif:/container/service/slapd/assets/config/bootstrap/ldif/custom/04-configure-ppolicy-overlay.ldif'
+      - './config/openldap/assets/config/bootstrap/ldif/custom/05-default-ppolicy.ldif:/container/service/slapd/assets/config/bootstrap/ldif/custom/05-default-ppolicy.ldif'
+      - './config/openldap/assets/config/bootstrap/ldif/custom/06-enforce-sha512.ldif:/container/service/slapd/assets/config/bootstrap/ldif/custom/06-enforce-sha512.ldif'
+
+  phpldapadmin:
+    image: "${PHPLDAPADMIN_IMAGE_NAME}:${PHPLDAPADMIN_IMAGE_VERSION}"
+    restart: 'unless-stopped'
+    logging: *default-logging
+    env_file:
+      - './env/phpldapadmin.env'
+    networks:
+      - 'openldap'
+
+  postgres:
+    image: "${POSTGRES_IMAGE_NAME}:${POSTGRES_IMAGE_VERSION}"
+    restart: 'unless-stopped'
+    logging: *default-logging
+    labels:
+      - 'co.elastic.logs/module=postgresql'
+    env_file:
+      - './env/postgres.env'
+    networks:
+      - 'keycloak'
+    volumes:
+      - 'keycloak_db:/var/lib/postgresql/data'
+
+  postgres_exporter:
+    image: "${POSTGRES_EXPORTER_IMAGE_NAME}:${POSTGRES_EXPORTER_IMAGE_VERSION}"
+    restart: 'unless-stopped'
+    logging: *default-logging
+    env_file:
+      - './env/postgres_exporter.env'
+    networks:
+      - 'keycloak'
+    ports:
+      - "${EXPORTER_LISTEN_IP_ADDRESS}:9187:9187"
+
+volumes:
+  keycloak_db: {}
+  openldap_certs: {}
+  openldap_config: {}
+  openldap_db: {}
