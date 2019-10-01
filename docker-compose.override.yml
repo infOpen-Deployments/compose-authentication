@@ -1,0 +1,23 @@
+---
+
+version: '3.4'
+
+networks:
+  traefik: {}
+
+services:
+  keycloak:
+    labels:
+      - 'traefik.docker.network=traefik'
+    networks:
+      - 'traefik'
+  openldap:
+    labels:
+      - 'traefik.docker.network=traefik'
+    networks:
+      - 'traefik'
+  phpldapadmin:
+    labels:
+      - 'traefik.docker.network=traefik'
+    networks:
+      - 'traefik'

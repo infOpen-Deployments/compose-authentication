@@ -1,0 +1,32 @@
+---
+
+version: '3.4'
+
+x-logging:
+  &default-logging
+  driver: 'json-file'
+  options:
+    max-size: "${LOGGING_MAX_SIZE}"
+    max-file: "${LOGGING_MAX_FILE}"
+
+services:
+  backup_worker:
+    image: "${BACKUP_WORKER_IMAGE_NAME}:${BACKUP_WORKER_IMAGE_VERSION}"
+    command: '/usr/sbin/sshd -D'
+    restart: 'unless-stopped'
+    logging: *default-logging
+    depends_on:
+      - 'postgres'
+      - 'openldap'
+      - 'keycloak'
+    networks:
+      - 'keycloak'
+      - 'services'
+    ports:
+      - "${LISTEN_IP_ADDRESS}:2222:22"
+    user: 'root'
+    volumes:
+      - './config/backup_worker/authorized_keys:/home/backup/.ssh/authorized_keys'
+      - 'openldap_config:/data/openldap_config'
+      - 'openldap_db:/data/openldap_db'
+      - '/var/run/docker.sock:/var/run/docker.sock'

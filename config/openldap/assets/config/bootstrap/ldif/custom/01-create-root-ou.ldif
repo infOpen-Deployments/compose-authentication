@@ -1,0 +1,24 @@
+dn: ou=groups,{{ LDAP_BASE_DN }}
+objectclass: top
+objectclass: organizationalUnit
+ou: groups
+
+dn: ou=policies,{{ LDAP_BASE_DN }}
+objectclass: top
+objectclass: organizationalUnit
+ou: policies
+
+dn: ou=pwd-policies,{{ LDAP_BASE_DN }}
+objectclass: top
+objectclass: organizationalUnit
+ou: pwd-policies
+
+dn: ou=users,{{ LDAP_BASE_DN }}
+objectclass: top
+objectclass: organizationalUnit
+ou: users
+
+dn: ou=roles,{{ LDAP_BASE_DN }}
+objectclass: top
+objectclass: organizationalUnit
+ou: roles

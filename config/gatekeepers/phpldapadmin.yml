@@ -1,0 +1,11 @@
+---
+
+client-id: 'phpldapadmin'
+client-secret: 'foobar'
+discovery-url: 'http://192.168.1.82:8080/auth/realms/test'
+redirection-url: 'http://phpldapadmin.localhost/'
+enable-default-deny: true
+encryption_key: 'foo'
+listen: '0.0.0.0:3000'
+upstream-url: 'http://phpldapadmin:80'
+secure-cookie: false

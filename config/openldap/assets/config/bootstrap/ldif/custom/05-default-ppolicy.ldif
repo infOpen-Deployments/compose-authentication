@@ -1,0 +1,21 @@
+dn: cn=default,ou=pwd-policies,{{ LDAP_BASE_DN }}
+objectClass: pwdPolicy
+objectClass: person
+objectClass: top
+cn: default
+sn: default
+pwdAttribute: userPassword
+pwdCheckQuality: 2
+pwdMinAge: 0
+pwdMaxAge: 0
+pwdMinLength: 8
+pwdInHistory: 5
+pwdMaxFailure: 5
+pwdFailureCountInterval: 300
+pwdLockout: TRUE
+pwdLockoutDuration: 300
+pwdAllowUserChange: TRUE
+pwdExpireWarning: 0
+pwdGraceAuthNLimit: 0
+pwdMustChange: FALSE
+pwdSafeModify: TRUE
